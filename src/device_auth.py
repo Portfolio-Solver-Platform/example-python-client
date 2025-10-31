@@ -1,5 +1,6 @@
 import time
 import requests
+import webbrowser
 from .config import Config
 
 
@@ -9,24 +10,67 @@ class DeviceAuth:
     def __init__(self, config: Config):
         self.config = config
 
-    def discover_endpoints(self):
+    def get_token(self) -> tuple[dict, dict | None]:
+        """
+        Initiatise the device authorization flow.
+        When it is finished, it returns the access token and refresh token.
+        """
+        conf = self._discover_endpoints()
+        device_auth_url = conf["device_authorization_endpoint"]
+        token_url = conf["token_endpoint"]
+
+        device_info = self._request_device_code(device_auth_url)
+
+        self._verify_user(device_info)
+        token_response = self._poll_token(
+            token_url, device_info["device_code"], device_info.get("interval", 5)
+        )
+
+        return token_response["access_token"], token_response.get("refresh_token")
+
+    def _verify_user(self, device_info: dict):
+        verification_url = (
+            device_info.get("verification_uri_complete") or response["verification_uri"]
+        )
+
+        complete_uri = device_info.get("verification_uri_complete")
+        if complete_uri:
+            print("Opening login window in your browser...")
+            webbrowser.open(complete_uri)
+            print(
+                "If it did not open, go to:", device_info["verification_uri_complete"]
+            )
+            print()
+            print("Or alternatively,")
+
+        print("Go to:", device_info["verification_uri"])
+        print("And enter code:", device_info["user_code"])
+
+    def _discover_endpoints(self):
         r = requests.get(self.config.server_metadata_url)
         r.raise_for_status()
         return r.json()
 
-    def request_device_code(self, device_endpoint):
-        data = {"client_id": self.config.client_id, "scope": self.config.scope}
+    def _client_data(self):
+        return {
+            "client_id": self.config.client_id,
+            "client_secret": self.config.client_secret,
+        }
+
+    def _request_device_code(self, device_endpoint):
+        data = self._client_data() | {
+            "scope": self.config.scope,
+        }
         r = requests.post(device_endpoint, data=data)
         r.raise_for_status()
         return r.json()
 
-    def poll_token(self, token_endpoint, device_code, interval):
+    def _poll_token(self, token_endpoint, device_code, interval):
         while True:
             time.sleep(interval)
-            data = {
+            data = self._client_data() | {
                 "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
                 "device_code": device_code,
-                "client_id": self.config.client_id,
             }
             r = requests.post(token_endpoint, data=data)
             if r.status_code == 200:
@@ -43,22 +87,3 @@ class DeviceAuth:
                     raise RuntimeError(f"Error: {err}")
             else:
                 r.raise_for_status()
-
-    def get_token(self) -> tuple[dict, dict | None]:
-        """
-        Initiatise the device authorization flow.
-        When it is finished, it returns the access token and refresh token.
-        """
-        conf = self.discover_endpoints()
-        device_auth_url = conf["device_authorization_endpoint"]
-        token_url = conf["token_endpoint"]
-
-        device_info = self.request_device_code(device_auth_url)
-        print("Go to:", device_info["verification_uri"])
-        print("Enter code:", device_info["user_code"])
-
-        token_response = self.poll_token(
-            token_url, device_info["device_code"], device_info.get("interval", 5)
-        )
-
-        return token_response["access_token"], token_response.get("refresh_token")
