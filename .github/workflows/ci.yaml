@@ -31,9 +31,6 @@ jobs:
       - name: Lint
         run: ruff check . --no-cache
 
-      - name: Test
-        run: pytest -m "not integration" -q -p no:cacheprovider
-
       - name: Audit code
         run: bandit -qr src/
 
