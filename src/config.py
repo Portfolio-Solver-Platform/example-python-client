@@ -5,3 +5,6 @@ class Config:
     server_metadata_url: str = (
         "http://local/api/user/v1/.well-known/openid-configuration"
     )
+
+    class Timeout:
+        default = (2, 10)  # (connect timeout, read timeout)

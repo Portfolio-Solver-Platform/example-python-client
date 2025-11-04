@@ -1,5 +1,7 @@
 from .device_auth import DeviceAuth
 from .config import Config
+import requests
+from pprint import pprint
 
 
 def main():
@@ -9,6 +11,19 @@ def main():
     print()
     print("==== Refresh token ====")
     print(refresh_token)
+
+    groups(access_token)
+
+
+def groups(token: str):
+    response = requests.get(
+        "http://local/api/solverdirector/v1/groups",
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=Config.Timeout.default,
+    )
+    pprint(response)
+    response.raise_for_status()
+    pprint(response.json())
 
 
 if __name__ == "__main__":
