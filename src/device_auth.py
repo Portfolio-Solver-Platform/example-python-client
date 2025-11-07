@@ -1,7 +1,7 @@
 import time
 import requests
 import webbrowser
-from .config import Config
+from config import Config
 
 
 class DeviceAuth:

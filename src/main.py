@@ -1,5 +1,5 @@
-from .device_auth import DeviceAuth
-from .config import Config
+from device_auth import DeviceAuth
+from config import Config
 import requests
 from pprint import pprint
 
