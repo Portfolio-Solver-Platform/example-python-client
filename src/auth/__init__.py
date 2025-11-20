@@ -12,7 +12,9 @@ class Auth:
         self.config = config
 
     def discover_endpoints(self) -> dict:
-        r = requests.get(self.config.server_metadata_url)
+        r = requests.get(
+            self.config.server_metadata_url, timeout=self.config.Timeout.default
+        )
         r.raise_for_status()
         return r.json()
 
@@ -20,7 +22,7 @@ class Auth:
         return self.discover_endpoints()["jwks_uri"]
 
     def jwt_keys(self) -> dict:
-        r = requests.get(self.jwks_url())
+        r = requests.get(self.jwks_url(), timeout=self.config.Timeout.default)
         r.raise_for_status()
         return r.json()
 
