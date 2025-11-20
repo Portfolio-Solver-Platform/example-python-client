@@ -1,7 +1,7 @@
 import time
 import requests
 import webbrowser
-from .config import Config
+from config import Config
 
 
 class DeviceAuth:
@@ -29,10 +29,6 @@ class DeviceAuth:
         return token_response["access_token"], token_response.get("refresh_token")
 
     def _verify_user(self, device_info: dict):
-        verification_url = (
-            device_info.get("verification_uri_complete") or response["verification_uri"]
-        )
-
         complete_uri = device_info.get("verification_uri_complete")
         if complete_uri:
             print("Opening login window in your browser...")
@@ -47,7 +43,9 @@ class DeviceAuth:
         print("And enter code:", device_info["user_code"])
 
     def _discover_endpoints(self):
-        r = requests.get(self.config.server_metadata_url)
+        r = requests.get(
+            self.config.server_metadata_url, timeout=self.config.Timeout.default
+        )
         r.raise_for_status()
         return r.json()
 
@@ -61,7 +59,9 @@ class DeviceAuth:
         data = self._client_data() | {
             "scope": self.config.scope,
         }
-        r = requests.post(device_endpoint, data=data)
+        r = requests.post(
+            device_endpoint, data=data, timeout=self.config.Timeout.default
+        )
         r.raise_for_status()
         return r.json()
 
@@ -72,7 +72,9 @@ class DeviceAuth:
                 "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
                 "device_code": device_code,
             }
-            r = requests.post(token_endpoint, data=data)
+            r = requests.post(
+                token_endpoint, data=data, timeout=self.config.Timeout.default
+            )
             if r.status_code == 200:
                 return r.json()
             elif r.status_code == 400:

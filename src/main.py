@@ -1,8 +1,6 @@
 from auth import Auth
-from device_auth import DeviceAuth
+from auth.device_auth import DeviceAuth
 from config import Config
-import requests
-from pprint import pprint
 
 
 def main():
