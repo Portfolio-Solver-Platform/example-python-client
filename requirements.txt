@@ -13,9 +13,13 @@ cffi==2.0.0
 charset-normalizer==3.4.3
     # via requests
 cryptography==46.0.2
-    # via authlib
+    # via
+    #   authlib
+    #   joserfc
 idna==3.10
     # via requests
+joserfc==1.4.3
+    # via example-client (pyproject.toml)
 pycparser==2.23
     # via cffi
 requests==2.32.5
