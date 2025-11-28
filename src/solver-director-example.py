@@ -1,66 +1,80 @@
 from time import sleep
-from device_auth import DeviceAuth
+from auth.device_auth import DeviceAuth
 from config import Config
 import requests
 from pprint import pprint
+from solver_director import (
+    create_project,
+    delete_project,
+    get_project_config,
+    get_project_solution,
+    get_project_status,
+    get_projects,
+)
 
 
-def main():
-    access_token, refresh_token = DeviceAuth(Config).get_token()
-    print("==== Access token ====")
-    print(access_token)
-    print()
-    print("==== Refresh token ====")
-    print(refresh_token)
-    print()
-
-    # Example workflow: Create, read, and delete a project
-
-
-
-    # 1. Create a new project
-    print("==== Creating a new project ====")
+def create_example_project(token: str) -> dict:
     project_config = {
         "name": "Test Project",
-        "configuration": [
+        "problem_groups": [
             {
                 "problemGroup": 1,
-                "solvers": [1, 2],
                 "problems": [
                     {"problem": 10, "instances": [1, 2, 3]},
                     {"problem": 11, "instances": [4, 5]},
                 ],
+                "extras": {
+                    "repetitions": 1,
+                    "solvers": [
+                        {
+                            "id": 1,
+                            "vcpus": 1,
+                        },
+                        {
+                            "id": 2,
+                            "vcpus": 1,
+                        },
+                    ],
+                },
             }
-        ]
+        ],
     }
-    new_project = create_project(access_token, project_config)
+    return create_project(token, project_config)
+
+
+def create_read_delete_project(token: str):
+    """Example workflow: Create, read, and delete a project."""
+
+    # 1. Create a new project
+    new_project = create_example_project(token)
     pprint(new_project)
     project_id = new_project["id"]
     print()
+    print("New project ID:", project_id)
+    print()
 
-    # 2. List all projects
     print("==== Listing all projects ====")
-    all_projects = get_projects(access_token)
+    all_projects = get_projects(token)
     pprint(all_projects)
     print()
 
     sleep(8)
     # 3. Get project status
     print(f"==== Getting project {project_id} status ====")
-    status = get_project_status(access_token, project_id)
+    status = get_project_status(token, project_id)
     pprint(status)
     print()
 
     # 4. Get project configuration
     print(f"==== Getting project {project_id} configuration ====")
-    config = get_project_config(access_token, project_id)
+    config = get_project_config(token, project_id)
     pprint(config)
     print()
 
     # 5. Try to get project solution (not implemented yet)
     print(f"==== Getting project {project_id} solution ====")
     try:
-        solution = get_project_solution(access_token, project_id)
+        solution = get_project_solution(token, project_id)
         pprint(solution)
     except requests.HTTPError as e:
         print(f"Expected error: {e}")
@@ -68,76 +82,28 @@ def main():
 
     # 6. Delete the project
     print(f"==== Deleting project {project_id} ====")
-    delete_project(access_token, project_id)
+    delete_project(token, project_id)
     print("Project deleted successfully")
     print()
 
 
-def create_project(token: str, config: dict) -> dict:
-    """Create a new project - requires projects:write scope"""
-    response = requests.post(
-        "http://local/api/solverdirector/v1/projects",
-        headers={"Authorization": f"Bearer {token}"},
-        json=config,
-        timeout=Config.Timeout.default,
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def get_projects(token: str) -> list:
-    """Get all projects for the authenticated user - requires projects:read scope"""
-    response = requests.get(
-        "http://local/api/solverdirector/v1/projects",
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=Config.Timeout.default,
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def get_project_status(token: str, project_id: str) -> dict:
-    """Get project status with solver controller info - requires projects:read scope"""
-    response = requests.get(
-        f"http://local/api/solverdirector/v1/projects/{project_id}/status",
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=Config.Timeout.default,
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def get_project_config(token: str, project_id: str) -> dict:
-    """Get project configuration - requires projects:read scope"""
-    response = requests.get(
-        f"http://local/api/solverdirector/v1/projects/{project_id}/config",
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=Config.Timeout.default,
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def get_project_solution(token: str, project_id: str) -> dict:
-    """Get project solution/results - requires projects:read scope (not yet implemented)"""
-    response = requests.get(
-        f"http://local/api/solverdirector/v1/projects/{project_id}/solution",
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=Config.Timeout.default,
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def delete_project(token: str, project_id: str) -> None:
-    """Delete a project - requires projects:write scope"""
-    response = requests.delete(
-        f"http://local/api/solverdirector/v1/projects/{project_id}",
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=Config.Timeout.default,
-    )
-    response.raise_for_status()
+def choose_create_or_solution(token: str):
+    print("1) Create example project")
+    print("2) Get the solution for a project")
+    print()
+    choice = input("Choose: ")
+    if choice == "1":
+        project = create_example_project(token)
+        print("Project ID:", project["id"])
+    elif choice == "2":
+        project_id = input("Project ID: ")
+        solution = get_project_solution(token, project_id)
+        pprint(solution)
+    else:
+        print(f"Unknown choice '{choice}', aborting")
+        exit()
 
 
 if __name__ == "__main__":
-    main()
+    token, refresh_token = DeviceAuth(Config).get_token()
+    choose_create_or_solution(token)
