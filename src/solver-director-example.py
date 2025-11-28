@@ -105,5 +105,5 @@ def choose_create_or_solution(token: str):
 
 
 if __name__ == "__main__":
-    token, refresh_token = DeviceAuth(Config).get_token()
-    choose_create_or_solution(token)
+    token = DeviceAuth(Config).token()
+    choose_create_or_solution(token.get())
