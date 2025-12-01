@@ -19,20 +19,16 @@ def create_example_project(token: Token) -> dict:
         "name": "Test Project",
         "problem_groups": [
             {
-                "problemGroup": 1,
+                "problem_group": 1,
                 "problems": [
-                    {"problem": 10, "instances": [1, 2, 3]},
-                    {"problem": 11, "instances": [4, 5]},
+                    {"problem": 66, "instances": [534, 535, 536]},
+                    {"problem": 66, "instances": [537, 538]},
                 ],
                 "extras": {
                     "repetitions": 1,
                     "solvers": [
                         {
-                            "id": 1,
-                            "vcpus": 1,
-                        },
-                        {
-                            "id": 2,
+                            "id": 4,
                             "vcpus": 1,
                         },
                     ],
