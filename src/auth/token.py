@@ -69,6 +69,7 @@ class Token:
     def refresh(self) -> None:
         if self._refresh_token is None:
             self.authenticate()
+            return
 
         if time.time() > (self._refresh_token_expires_at - self._leeway):
             self.authenticate()

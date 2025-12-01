@@ -107,9 +107,9 @@ def choose_create_and_get_solution(token: Token):
     print_solution_continuously(token, project_id)
 
 
-def print_solution_continuously(token: Token, project_id: int):
+def print_solution_continuously(token: Token, project_id: str):
     while True:
-        solution = get_project_solution(token.get(), project_id)
+        solution = get_project_solution(token, project_id)
         print()
         print("==== SOLUTION ====")
         pprint(solution)
