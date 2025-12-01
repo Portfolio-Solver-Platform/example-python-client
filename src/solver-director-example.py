@@ -96,7 +96,7 @@ def choose_create_and_get_solution(token: Token):
         choice = input("Choose: ")
         if choice == "1":
             project_id = create_example_project(token)["id"]
-            print("Project ID:", project["id"])
+            print("Project ID:", project_id)
         elif choice == "2":
             project_id = input("Project ID: ")
         else:
