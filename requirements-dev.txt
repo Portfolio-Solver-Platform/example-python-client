@@ -4,8 +4,6 @@
 #
 #    pip-compile --extra=dev --output-file=requirements-dev.txt --strip-extras pyproject.toml
 #
-authlib==1.6.5
-    # via example-client (pyproject.toml)
 bandit==1.8.6
     # via example-client (pyproject.toml)
 boolean-py==5.0
@@ -23,9 +21,7 @@ charset-normalizer==3.4.3
 coverage==7.10.6
     # via pytest-cov
 cryptography==46.0.2
-    # via
-    #   authlib
-    #   joserfc
+    # via joserfc
 cyclonedx-python-lib==9.1.0
     # via pip-audit
 defusedxml==0.7.1

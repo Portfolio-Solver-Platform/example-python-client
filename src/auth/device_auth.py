@@ -2,20 +2,26 @@ import time
 import requests
 import webbrowser
 from config import Config
+from auth import Auth, Token
 
 
 class DeviceAuth:
     config: Config
+    _auth: Auth
 
     def __init__(self, config: Config):
         self.config = config
+        self._auth = Auth(self.config)
 
-    def get_token(self) -> tuple[dict, dict | None]:
+    def token(self) -> Token:
+        return Token(self._auth, self.auth)
+
+    def auth(self) -> tuple[str, str | None, int | None]:
         """
-        Initiatise the device authorization flow.
-        When it is finished, it returns the access token and refresh token.
+        Initialise the device authorization flow.
+        When it is finished, it returns the access token, refresh token and how long until the refresh token expires.
         """
-        conf = self._discover_endpoints()
+        conf = self._auth.endpoints()
         device_auth_url = conf["device_authorization_endpoint"]
         token_url = conf["token_endpoint"]
 
@@ -26,7 +32,11 @@ class DeviceAuth:
             token_url, device_info["device_code"], device_info.get("interval", 5)
         )
 
-        return token_response["access_token"], token_response.get("refresh_token")
+        return (
+            token_response["access_token"],
+            token_response.get("refresh_token"),
+            token_response.get("refresh_expires_in"),
+        )
 
     def _verify_user(self, device_info: dict):
         complete_uri = device_info.get("verification_uri_complete")
@@ -41,13 +51,6 @@ class DeviceAuth:
 
         print("Go to:", device_info["verification_uri"])
         print("And enter code:", device_info["user_code"])
-
-    def _discover_endpoints(self):
-        r = requests.get(
-            self.config.server_metadata_url, timeout=self.config.Timeout.default
-        )
-        r.raise_for_status()
-        return r.json()
 
     def _client_data(self):
         return {
