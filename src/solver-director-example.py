@@ -1,4 +1,5 @@
 from time import sleep
+from auth import Token
 from auth.device_auth import DeviceAuth
 from config import Config
 import requests
@@ -13,7 +14,7 @@ from solver_director import (
 )
 
 
-def create_example_project(token: str) -> dict:
+def create_example_project(token: Token) -> dict:
     project_config = {
         "name": "Test Project",
         "problem_groups": [
@@ -39,7 +40,7 @@ def create_example_project(token: str) -> dict:
             }
         ],
     }
-    return create_project(token, project_config)
+    return create_project(token.get(), project_config)
 
 
 def create_read_delete_project(token: str):
@@ -87,23 +88,36 @@ def create_read_delete_project(token: str):
     print()
 
 
-def choose_create_or_solution(token: str):
-    print("1) Create example project")
-    print("2) Get the solution for a project")
+def choose_create_and_get_solution(token: Token):
+    print("1) Create example project and print solution")
+    print("2) Print solution of existing project")
     print()
-    choice = input("Choose: ")
-    if choice == "1":
-        project = create_example_project(token)
-        print("Project ID:", project["id"])
-    elif choice == "2":
-        project_id = input("Project ID: ")
-        solution = get_project_solution(token, project_id)
+    while True:
+        choice = input("Choose: ")
+        if choice == "1":
+            project_id = create_example_project(token)["id"]
+            print("Project ID:", project["id"])
+        elif choice == "2":
+            project_id = input("Project ID: ")
+        else:
+            print(f"Unknown choice '{choice}'")
+            continue
+        break
+
+    print_solution_continuously(token, project_id)
+
+
+def print_solution_continuously(token: Token, project_id: int):
+    while True:
+        solution = get_project_solution(token.get(), project_id)
+        print()
+        print("==== SOLUTION ====")
         pprint(solution)
-    else:
-        print(f"Unknown choice '{choice}', aborting")
-        exit()
+        sleep(10)
+        print()
+        print()
 
 
 if __name__ == "__main__":
     token = DeviceAuth(Config).token()
-    choose_create_or_solution(token.get())
+    choose_create_and_get_solution(token)
