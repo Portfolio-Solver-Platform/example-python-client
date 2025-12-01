@@ -14,12 +14,12 @@ class DeviceAuth:
         self._auth = Auth(self.config)
 
     def token(self) -> Token:
-        return Token(self._auth, lambda: self.auth())
+        return Token(self._auth, self.auth)
 
-    def auth(self) -> tuple[str, str | None]:
+    def auth(self) -> tuple[str, str | None, int | None]:
         """
-        Initiatise the device authorization flow.
-        When it is finished, it returns the access token and refresh token.
+        Initialise the device authorization flow.
+        When it is finished, it returns the access token, refresh token and how long until the refresh token expires.
         """
         conf = self._auth.endpoints()
         device_auth_url = conf["device_authorization_endpoint"]

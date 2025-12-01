@@ -40,10 +40,10 @@ def create_example_project(token: Token) -> dict:
             }
         ],
     }
-    return create_project(token.get(), project_config)
+    return create_project(token, project_config)
 
 
-def create_read_delete_project(token: str):
+def create_read_delete_project(token: Token):
     """Example workflow: Create, read, and delete a project."""
 
     # 1. Create a new project

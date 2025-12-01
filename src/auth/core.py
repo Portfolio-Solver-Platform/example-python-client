@@ -1,7 +1,7 @@
 import requests
 from config import Config
 from joserfc import jwt
-from joserfc.jwt import Token
+from joserfc.jwt import Token as JWTToken
 from joserfc.jwk import KeySet
 
 
@@ -42,7 +42,7 @@ class Auth:
         r.raise_for_status()
         return r.json()
 
-    def decode_token(self, token: str) -> Token:
+    def decode_token(self, token: str) -> JWTToken:
         key_set = KeySet.import_key_set(self.jwt_keys())
         return jwt.decode(token, key_set)
 

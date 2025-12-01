@@ -1,4 +1,4 @@
-from auth import Auth
+from auth.core import Auth
 from typing import Callable
 import logging
 import requests
@@ -32,7 +32,7 @@ class Token:
         if not lazy:
             self.authenticate()
 
-    def get(self) -> dict:
+    def get(self) -> str:
         if self.is_expired():
             self.refresh()
 
@@ -43,12 +43,12 @@ class Token:
         access_token: str,
         refresh_token: str | None,
         refresh_expires_in: int | None,
-    ):
+    ) -> None:
         self._access_token = access_token
         self._refresh_token = refresh_token
         self._update_expirations(refresh_expires_in)
 
-    def _update_expirations(self, refresh_expires_in: int | None):
+    def _update_expirations(self, refresh_expires_in: int | None) -> None:
         self._access_token_expires_at = self.claims()["exp"]
         if refresh_expires_in is not None:
             self._refresh_token_expires_at = time.time() + refresh_expires_in
@@ -62,11 +62,14 @@ class Token:
 
         return time.time() > (self._access_token_expires_at - self._leeway)
 
-    def authenticate(self):
+    def authenticate(self) -> None:
         access_token, refresh_token, refresh_expires_in = self._auth_func()
         self._set_token(access_token, refresh_token, refresh_expires_in)
 
-    def refresh(self):
+    def refresh(self) -> None:
+        if self._refresh_token is None:
+            self.authenticate()
+
         if time.time() > (self._refresh_token_expires_at - self._leeway):
             self.authenticate()
             return
