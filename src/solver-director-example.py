@@ -17,12 +17,12 @@ from solver_director import (
 def create_example_project(token: Token) -> dict:
     project_config = {
         "name": "Test Project",
+        "timeout": 300,
         "problem_groups": [
             {
                 "problem_group": 1,
                 "problems": [
-                    {"problem": 66, "instances": [534, 535, 536]},
-                    {"problem": 66, "instances": [537, 538]},
+                    {"problem": 66, "instances": [534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553]},
                 ],
                 "extras": {
                     "repetitions": 1,
