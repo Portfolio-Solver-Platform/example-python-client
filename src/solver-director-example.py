@@ -22,7 +22,7 @@ def create_example_project(token: Token) -> dict:
             {
                 "problem_group": 1,
                 "problems": [
-                    {"problem": 66, "instances": [534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553]},
+                    {"problem": 66, "instances": [534, 535, 536, 537, 538, 539, 540, 541, 542, 543]},
                 ],
                 "extras": {
                     "repetitions": 1,
@@ -105,13 +105,19 @@ def choose_create_and_get_solution(token: Token):
 
 def print_solution_continuously(token: Token, project_id: str):
     while True:
-        solution = get_project_solution(token, project_id)
-        print()
-        print("==== SOLUTION ====")
-        pprint(solution)
+        try:
+            status = get_project_status(token, project_id)
+            if status["status"]["isFinished"]:
+                solution = get_project_solution(token, project_id)
+                print()
+                print("==== SOLUTION ====")
+                pprint(solution)
+                break
+        except requests.HTTPError as e:
+            if e.response.status_code != 503:
+                raise
+            print("Solver controller not ready yet, retrying...")
         sleep(10)
-        print()
-        print()
 
 
 if __name__ == "__main__":
