@@ -18,18 +18,21 @@ def create_example_project(token: Token) -> dict:
     project_config = {
         "name": "Test Project",
         "timeout": 300,
+        "vcpus": 8,
+        "memory_gib": 8.0,
         "problem_groups": [
             {
                 "problem_group": 1,
                 "problems": [
-                    {"problem": 66, "instances": [534, 535, 536, 537, 538, 539, 540, 541, 542, 543]},
+                    {"problem": 66, "instances": [534, 535, 536, 537, 538]},#, 539, 540, 541, 542, 543]},
                 ],
                 "extras": {
                     "repetitions": 1,
                     "solvers": [
                         {
                             "id": 4,
-                            "vcpus": 1,
+                            "vcpus": 3,
+                            "memory_gib": 4.0,
                         },
                     ],
                 },
@@ -117,6 +120,12 @@ def print_solution_continuously(token: Token, project_id: str):
             if e.response.status_code != 503:
                 raise
             print("Solver controller not ready yet, retrying...")
+            # projects = get_projects(token)
+            # project = next((p for p in projects if p["id"] == project_id), None)
+            # if project and project.get("is_queued"):
+            #     print("Project is queued, waiting for resources...")
+            # else:
+            #     print("Solver controller not ready yet, retrying...")
         sleep(10)
 
 
