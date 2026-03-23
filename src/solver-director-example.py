@@ -18,8 +18,8 @@ def create_example_project(token: Token) -> dict:
     project_config = {
         "name": "Test Project",
         "timeout": 300,
-        "vcpus": 8,
-        "memory_gib": 8.0,
+        "vcpus": 3,
+        "memory_gib": 4.0,
         "problem_groups": [
             {
                 "problem_group": 1,
@@ -31,8 +31,8 @@ def create_example_project(token: Token) -> dict:
                     "solvers": [
                         {
                             "id": 4,
-                            "vcpus": 3,
-                            "memory_gib": 4.0,
+                            "vcpus": 1,
+                            "memory_gib": 2.0,
                         },
                     ],
                 },
