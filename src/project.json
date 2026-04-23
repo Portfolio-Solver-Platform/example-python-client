@@ -1,0 +1,24 @@
+{
+    "name": "Test Project",
+    "timeout": 300,
+    "vcpus": 1,
+    "memory_gib": 1.0,
+    "problem_groups": [
+        {
+            "problem_group": 1,
+            "problems": [
+                {"problem": 34, "instances": [270]}
+            ],
+            "extras": {
+                "repetitions": 1,
+                "solvers": [
+                    {
+                        "id": 1,
+                        "vcpus": 1,
+                        "memory_gib": 1.0
+                    }
+                ]
+            }
+        }
+    ]
+}
